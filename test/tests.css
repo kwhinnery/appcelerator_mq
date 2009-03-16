@@ -1,0 +1,80 @@
+* {
+  font-family:"Andale Mono","Trebuchet MS",sans-serif;
+}
+
+body {
+  background:#ddd url(appcelerator.png) no-repeat top center;
+}
+
+#container {
+  width:800px;
+  padding:0 10px 0 10px;
+  margin:1em auto;
+  background-color:#333;
+  filter:alpha(opacity=85);
+  -moz-opacity:0.85;
+  -khtml-opacity: 0.85;
+  opacity: 0.85;
+}
+
+ul {
+  list-style:none;
+  padding:0;
+  margin:0;
+}
+
+a, a:visited, a:active {
+  color:#fff;
+}
+
+a:hover {
+  text-decoration:none;
+}
+
+h1,h2,h3 {
+  color:#fff;
+}
+
+.header {
+  margin:3px;
+  padding:3px;
+}
+
+.header h1 {
+  color:#fff;
+  font-size:30px;
+  padding:10px;
+  margin:0;
+  font-style:italic;
+}
+
+.results {
+  padding:10px;
+  font-size:14px;
+  color:#fff;
+}
+
+.results li {
+  margin-top:5px;
+}
+
+.status {
+  font-style:italic;
+}
+
+.success {
+  color:#00FF00;
+}
+
+.warn {
+  color:yellow;
+}
+
+.failure {
+  color:#FF3300;
+}
+
+.summary {
+  margin-top:10px;
+  font-style:italic;
+}
