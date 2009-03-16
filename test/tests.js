@@ -59,7 +59,6 @@ App.mq.api.onload(function(){
         App.mq.api.ajax({
           url: 'ajaxed.html',
           success: function(data) {
-            alert(data);
             if (data === "<html><body>Ajax!</body></html>") {
               htmlFetched = true;
             }
