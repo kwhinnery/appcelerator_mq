@@ -5,13 +5,13 @@ publish/subscribe style of event handling through static functions like so:
 
 Publish:
 
-  $MQ("my.message");
+    $MQ("my.message");
 
 Subscribe:
 
-  $MQL("my.message", function(message) {
-    alert("Event-driven UI is super awesome!");
-  });
+    $MQL("my.message", function(message) {
+      alert("Event-driven UI is super awesome!");
+    });
 
 ##Building:##
 
@@ -19,7 +19,7 @@ To create a compressed version of the plug-in from source, navigate to the
 top-level project directory and execute the following command to create a
 compressed file called 'mq.min.js':
 
-  java -jar yuicompressor-2.3.6.jar mq.js -o mq.min.js
+    java -jar yuicompressor-2.3.6.jar mq.js -o mq.min.js
 
 ##Contributing:##
 
