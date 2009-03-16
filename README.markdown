@@ -1,7 +1,14 @@
 #Appcelerator Message Queue (MQ)#
 Appcelerator MQ is a simple client-side message bus for HTML/JavaScript applications
-which enables true event-driven UI programming in the browser.  MQ provides a
-publish/subscribe style of event handling through static functions like so:
+which enables true event-driven UI programming in the browser.  Appcelerator MQ works
+alongside several popular DOM Manipulation and Ajax libraries, including the following:
+
+* jQuery (1.3.2) - Loaded by default if none present
+* Dojo (1.2.3)
+* MooTools (1.2.1)
+* Prototype (1.6.0.3)
+  
+MQ provides a publish/subscribe style of event handling through static functions like so:
 
 Publish:
 
