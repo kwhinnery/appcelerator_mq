@@ -1,0 +1,78 @@
+require 'rake'
+require 'pathname'
+require 'find'
+require 'zip/zip'
+require 'yaml'
+require 'fileutils'
+
+BUILD_DIR = File.join(ROOT_DIR, 'build')
+STAGE_DIR = File.join(ROOT_DIR, 'stage')
+SRC_DIR = File.join(ROOT_DIR, 'src')
+TEST_DIR = File.join(ROOT_DIR, 'test')
+CONFIG = YAML::load_file(File.join(BUILD_DIR, 'config.yml'))
+
+puts "Now building Appcelerator MQ (v" + CONFIG[:version] + ")..."
+
+task :default => [:all] do
+end
+
+desc "Build all Appcelerator MQ Packages"
+task :all => %w(stage package) do
+  puts "Code Strong!"
+end
+
+desc "Build and deploy debug files to stage for testing/packaging"
+task :stage do
+  FileUtils.mkdir STAGE_DIR unless File.exists? STAGE_DIR
+  FileUtils.mkdir STAGE_DIR+"/development" unless File.exists? STAGE_DIR+"/development"
+  
+  mqversion = CONFIG[:name]+"-"+CONFIG[:version]
+  
+  # Create Uncompressed development version of JS
+  DEBUG_JS = STAGE_DIR+"/development/#{mqversion}.debug.js"
+  FileUtils.rm_f DEBUG_JS if File.exists? DEBUG_JS
+  FileUtils.touch DEBUG_JS
+  debug_js = File.open(DEBUG_JS, 'a')
+  debug_js.write(File.read(SRC_DIR+"/core/bootstrap.js"))
+  debug_js.write(File.read(SRC_DIR+"/core/json2.js"))
+  debug_js.write(File.read(SRC_DIR+"/core/adapter.js"))
+  debug_js.write(File.read(SRC_DIR+"/core/mq.js"))
+  debug_js.close
+  
+  # Copy over uncompressed Listeners
+  FileUtils.mkdir STAGE_DIR+"/development/listeners" unless File.exists? STAGE_DIR+"/development/listeners" 
+  FileUtils.cp SRC_DIR+"/listeners/rails.mq.js", STAGE_DIR+"/development/listeners/rails.#{mqversion}.debug.js"
+  FileUtils.cp SRC_DIR+"/listeners/servicebroker.mq.js", STAGE_DIR+"/development/listeners/servicebroker.#{mqversion}.debug.js"
+  
+  # Create compressed versions
+  FileUtils.mkdir STAGE_DIR+"/production" unless File.exists? STAGE_DIR+"/production"
+  FileUtils.mkdir STAGE_DIR+"/production/listeners" unless File.exists? STAGE_DIR+"/production/listeners"
+  
+  yuicompress = "java -jar #{BUILD_DIR}/yuicompressor-2.3.6.jar "
+  system(yuicompress+STAGE_DIR+"/development/#{mqversion}.debug.js -o "+STAGE_DIR+"/production/#{mqversion}.min.js")
+  system(yuicompress+STAGE_DIR+"/development/listeners/rails.#{mqversion}.debug.js -o "+STAGE_DIR+"/production/listeners/rails.#{mqversion}.min.js")
+  system(yuicompress+STAGE_DIR+"/development/listeners/servicebroker.#{mqversion}.debug.js -o "+STAGE_DIR+"/production/listeners/servicebroker.#{mqversion}.min.js")
+  
+  puts "JavaScript for development and production staged and compressed."
+end
+
+desc "Create ZIP packages for development and deployment from uncompressed versions"
+task :package => [:stage] do
+  mqversion = CONFIG[:name]+"-"+CONFIG[:version]
+  
+  devpkg = STAGE_DIR+"/#{mqversion}-development.zip"
+  prodpkg = STAGE_DIR+"/#{mqversion}-production.zip"
+  FileUtils.rm_f devpkg if File.exists? devpkg
+  FileUtils.rm_f prodpkg if File.exists? prodpkg
+  Zip::ZipFile.open(devpkg, Zip::ZipFile::CREATE) do |zipfile|
+    zipfile.add("#{mqversion}.debug.js",STAGE_DIR+"/development/#{mqversion}.debug.js")
+    zipfile.add("listeners/rails.#{mqversion}.debug.js",STAGE_DIR+"/development/listeners/rails.#{mqversion}.debug.js")
+    zipfile.add("listeners/servicebroker.#{mqversion}.debug.js",STAGE_DIR+"/development/listeners/servicebroker.#{mqversion}.debug.js")
+  end
+  Zip::ZipFile.open(prodpkg, Zip::ZipFile::CREATE) do |zipfile|
+    zipfile.add("#{mqversion}.min.js",STAGE_DIR+"/production/#{mqversion}.min.js")
+    zipfile.add("listeners/rails.#{mqversion}.min.js",STAGE_DIR+"/production/listeners/rails.#{mqversion}.min.js")
+    zipfile.add("listeners/servicebroker.#{mqversion}.min.js",STAGE_DIR+"/production/listeners/servicebroker.#{mqversion}.min.js")
+  end
+  puts "Download packages created."
+end
