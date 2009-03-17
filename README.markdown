@@ -22,11 +22,15 @@ Subscribe:
 
 ##Building:##
 
-To create a compressed version of the plug-in from source, navigate to the 
-top-level project directory and execute the following command to create a
-compressed file called 'mq.min.js':
+Appcelerator MQ is built using Rake (a Ruby build tool).  To build MQ, you will need to
+install a Ruby interpreter for you system is one is not installed.  You will also need
+RubyGems to install the `rake` and `rubyzip` gems.  Once these items are installed, you can
+build Appcelerator MQ by running the `rake` command from the project root:
 
-    java -jar yuicompressor-2.3.6.jar mq.js -o mq.min.js
+    rake [optional target]
+    
+Available tasks are `stage` (to create JS files for testing) and `package` (to create Zip
+files from the staged JS files).  `rake`  with no arguments calls both tasks.
 
 ##Contributing:##
 
