@@ -1,3 +1,7 @@
+#PHASING OUT#
+
+Check out [the Entourage Project](http://github.com/kwhinnery/appcelerator_entourage) for this functionality.
+
 #Appcelerator Message Queue (MQ)#
 Appcelerator MQ is a simple client-side message bus for HTML/JavaScript applications
 which enables true event-driven UI programming in the browser.  Appcelerator MQ works
