@@ -1,5 +1,6 @@
 * {
   font-family:"Andale Mono","Trebuchet MS",sans-serif;
+  color:#fff;
 }
 
 body {
@@ -49,9 +50,10 @@ h1,h2,h3 {
 }
 
 .results {
-  padding:10px;
   font-size:14px;
   color:#fff;
+  max-height:400px;
+  overflow:auto;
 }
 
 .results li {
@@ -74,7 +76,16 @@ h1,h2,h3 {
   color:#FF3300;
 }
 
+#status {
+  border:1px dashed;
+  padding:10px;
+  margin-bottom:10px;
+}
+
+h3.summary {
+  margin:0 0 10px 0;
+}
+
 .summary {
-  margin-top:10px;
   font-style:italic;
 }

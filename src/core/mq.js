@@ -1,7 +1,7 @@
 (function() {
   //MQ configuration options
   App.mq.config = {
-    scan_interval: 150, //amount of time between queue scans
+    scan_interval: 150 //amount of time between queue scans
   };
   
   //Implement MQ API

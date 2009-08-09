@@ -377,15 +377,14 @@ App.mq.api.onload(function(){
   
   //print summary
   function end() {
-    var inner = document.getElementById("results").innerHTML;
-    inner = inner+"<br/><h3 class='summary'>Test Suite Summary:</h3>"+
+    var inner = "<h3 class='summary'>Test Suite Summary:</h3>"+
       "<div class='summary'>"+
       tests_executed+ " tests ("+
       assertions+" assertions) completed with <span class='success'>"+
       successes+" successes</span>, <span class='warn'>"+ 
       warnings+" warnings</span>, and <span class='failure'>"+
       failures+" failures</span>. <br/><br/>  Have a nice day!</div>";
-    document.getElementById("results").innerHTML = inner;
+    document.getElementById("status").innerHTML = inner;
   }  
   
   //Start running through tests
