@@ -1,17 +1,10 @@
-App.mq.api.onload(function(){
+window.onload = function(){
   //===========================
   //UNIT TEST DEFINITION
   //===========================
   var unit_tests = [ 
     {
-      name:"Ajax API - Onload Function",
-      unit_test: function() {
-        assert(true,"If these tests are running, onload is working for the detected library");
-        done();
-      }
-    },
-    {
-      name: "Ajax API - Extend Function",
+      name: "Core API - Extend Function",
       unit_test: function() {
         var defaultsSet = false;
         var defaultOverridden = false;
@@ -22,7 +15,7 @@ App.mq.api.onload(function(){
           value3:true
         };
         
-        var extended = App.mq.api.extend({
+        var extended = mq.extend({
           value1:"value1",
           value2:"value2"
         },toExtend);
@@ -44,34 +37,15 @@ App.mq.api.onload(function(){
       }
     },
     {
-      name: "Ajax API - Testing Ajax Requests",
+      name: "XMLHttpRequest test - <a href='http://code.google.com/p/xmlhttprequest'>Source</a>",
       unit_test: function() {
-        //MooTools does not support local Ajax requests,
-        //near as I can tell
-        if (typeof(window.MooTools) !== 'undefined') {
-          warn("MooTools does not support a local GET... Do they?");
+        warn("Need to implement some tests");
+        done();
+        
+        /*setTimeout(function() {
+          assert(htmlFetched,"GET request retrieved HTML.");
           done();
-          return;
-        }
-        
-        var htmlFetched = false;
-        
-        App.mq.api.ajax({
-          url: 'ajaxed.html',
-          success: function(data) {
-            if (data === "<html><body>Ajax!</body></html>") {
-              htmlFetched = true;
-            }
-          },
-          failure: function(foo) {
-            alert(foo);
-          }
-        });
-        
-        setTimeout(function() {
-          assert(htmlFetched,"GET request retrieved local HTML.");
-          done();
-        },500);
+        },500);*/
       }
     },
     {
@@ -81,10 +55,10 @@ App.mq.api.onload(function(){
         var parseGood = false;
         
         var tostring = { foo: "bar", foo2: [{foo3:true}] };
-        var json = App.mq.JSON.stringify(tostring);
+        var json = mq.JSON.stringify(tostring);
         toStringGood = json === '{"foo":"bar","foo2":[{"foo3":true}]}';
         
-        var fromstring = App.mq.JSON.parse(json);
+        var fromstring = mq.JSON.parse(json);
         if (fromstring.foo === "bar" && fromstring.foo2[0].foo3) {
           parseGood = true;
         }
@@ -100,36 +74,19 @@ App.mq.api.onload(function(){
         var matchWorked = false;
         var noMatchWorked = true;
         
-        App.mq.sub("test1", function(message) {
+        mq.sub("test1", function(message) {
           matchWorked = true;
         });
         
-        App.mq.sub("testXXXXXX", function(message) {
+        mq.sub("testXXXXXX", function(message) {
           noMatchWorked = false;
         });
         
-        App.mq.pub("test1");
+        mq.pub("test1");
         
         setTimeout(function() {
           assert(matchWorked, "Direct subscribe worked.");
           assert(noMatchWorked, "Direct subscribe does not catch all.");
-          done();
-        },333);
-      }
-    },
-    {
-      name: "MQ API - Direct Publish and Subscribe with macros",
-      unit_test: function() {
-        var matchWorked = false;
-        
-        $MQL("test2", function(message) {
-          matchWorked = true;
-        });
-        
-        $MQ("test2");
-        
-        setTimeout(function() {
-          assert(matchWorked, "Direct subscribe worked (with macros).");
           done();
         },333);
       }
@@ -140,15 +97,15 @@ App.mq.api.onload(function(){
         var matchWorked = false;
         var noMatchWorked = true;
         
-        $MQL(/test.*/, function(message) {
+        mq.sub(/test.*/, function(message) {
           matchWorked = true;
         });
         
-        $MQL(/fest.*/, function(message) {
+        mq.sub(/fest.*/, function(message) {
           noMatchWorked = false;
         });
         
-        $MQ("testregex");
+        mq.pub("testregex");
         
         setTimeout(function() {
           assert(matchWorked, "RegExp subscribe worked");
@@ -162,11 +119,11 @@ App.mq.api.onload(function(){
       unit_test: function() {
         var deilvered = false;
         
-        $MQL("test.payload", function(message) {
+        mq.sub("test.payload", function(message) {
           delivered = message.payload.foo;
         });
         
-        $MQ("test.payload", {foo:true});
+        mq.pub("test.payload", {foo:true});
         
         setTimeout(function() {
           assert(delivered, "Payload sent and received.");
@@ -180,15 +137,15 @@ App.mq.api.onload(function(){
         var scopeWorked = false;
         var noScopeWorked = true;
         
-        $MQL("test.scope", function(message) {
+        mq.sub("test.scope", function(message) {
           scopeWorked = true;
         },{scope:"myscope"});
         
-        $MQL("test.scope", function(message) {
+        mq.sub("test.scope", function(message) {
           noScopeWorked = false;
         });
         
-        $MQ("test.scope", {}, {scope:"myscope"});
+        mq.pub("test.scope", {}, {scope:"myscope"});
         
         setTimeout(function() {
           assert(scopeWorked, "Scoped message received.");
@@ -202,13 +159,13 @@ App.mq.api.onload(function(){
       unit_test: function() {
         var unsubbed = true;
         
-        var listener = $MQL("unsub", function(message) {
+        var listener = mq.sub("unsub", function(message) {
           unsubbed = false;
         });
         
-        App.mq.unsub(listener);
+        mq.unsub(listener);
         
-        $MQ("unsub");
+        mq.pub("unsub");
         
         setTimeout(function() {
           assert(unsubbed, "Message Unsubscribed Successfully.");
@@ -222,20 +179,20 @@ App.mq.api.onload(function(){
         var filteredDirect = false;
         var filteredRegExp = false;
         
-        App.mq.filter("filter1", function(message) {
+        mq.filter("filter1", function(message) {
           message.payload.direct = true;
         });
         
-        App.mq.filter(/filter.*/, function(message) {
+        mq.filter(/filter.*/, function(message) {
           message.payload.regexp = true;
         });
         
-        $MQL("filter1", function(message) {
+        mq.sub("filter1", function(message) {
           filteredDirect = message.payload.direct;
           filteredRegExp = message.payload.regexp;
         });
 
-        $MQ("filter1"); 
+        mq.pub("filter1"); 
                
         setTimeout(function() {
           assert(filteredDirect, "Direct filter applied");
@@ -250,15 +207,15 @@ App.mq.api.onload(function(){
         var scopeWorked = false;
         var noScopeWorked = true;
         
-        App.mq.filter("filterScope", function(message) {
+        mq.filter("filterScope", function(message) {
           scopeWorked = true;
         },{scope:"myscope"});
         
-        App.mq.filter("filterScope", function(message) {
+        mq.filter("filterScope", function(message) {
           noScopeWorked = false;
         });
 
-        $MQ("filterScope",{},{scope:"myscope"}); 
+        mq.pub("filterScope",{},{scope:"myscope"}); 
                
         setTimeout(function() {
           assert(scopeWorked, "Filter scope worked");
@@ -272,13 +229,13 @@ App.mq.api.onload(function(){
       unit_test: function() {
         var filtered = false;
         
-        var filter = App.mq.filter("unfilter", function(message) {
+        var filter = mq.filter("unfilter", function(message) {
           filtered = true;
         });
         
-        App.mq.unfilter(filter);
+        mq.unfilter(filter);
         
-        $MQ("unfilter");
+        mq.pub("unfilter");
         
         setTimeout(function() {
           assert(!filtered, "Filter removed successfully.");
@@ -291,13 +248,13 @@ App.mq.api.onload(function(){
       unit_test: function() {
         var delivered = false;
         
-        App.mq.config.scan_interval = 3000;
+        mq.config.scan_interval = 3000;
         
         setTimeout(function() {
-          $MQL("slowscan", function(message) {
+          mq.sub("slowscan", function(message) {
             delivered = true;
           });
-          $MQ("slowscan");
+          mq.pub("slowscan");
         },500);
         
         setTimeout(function() {
@@ -306,9 +263,41 @@ App.mq.api.onload(function(){
         
         setTimeout(function() {
           assert(delivered, "Message Queue scan interval configured successfully");
-          App.mq.config.scan_interval = 150;
+          mq.config.scan_interval = 150;
           done();
         },4000);
+      }
+    },
+    {
+      name: "Remote Messages - Test Hello World",
+      unit_test: function() {
+        var receivedWithPayload = false;
+        var scopeWorked = true;
+        
+        //Should receive response
+        mq.sub("r:say.hello.response",function(msg) {
+          alert('gotit!');
+          if (msg.payload == "Hello World!") {
+            receivedWithPayload = true;
+          }
+        });
+        
+        //Should NOT receive response due to scope
+        mq.sub("r:say.hello.response",function(msg) {
+          scopeWorked = false;
+        },{
+          scope:"myscope"
+        });
+        
+        //Send remote message
+        mq.pub("r:say.hello.request");
+        
+        //Test after we've had some time to get a response
+        setTimeout(function() {
+          assert(receivedWithPayload, "Remote response received with proper payload.");
+          assert(scopeWorked, "Remote response has proper default scope assigned");
+          done();
+        },3000);
       }
     }
   ];
@@ -400,6 +389,6 @@ App.mq.api.onload(function(){
       tst.unit_test.call({});
       tests_executed++;
     }
-  },333);
+  },10);
   
-});
+};

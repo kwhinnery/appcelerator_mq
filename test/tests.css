@@ -1,15 +1,16 @@
 * {
-  font-family:"Andale Mono","Trebuchet MS",sans-serif;
+  font-family:"Monaco",monospace,Helvetica,sans-serif;
   color:#fff;
 }
 
 body {
   background:#ddd url(appcelerator.png) no-repeat top center;
+  font-size:14px;
 }
 
 #container {
   width:800px;
-  padding:0 10px 0 10px;
+  padding:0 10px 10px 10px;
   margin:1em auto;
   background-color:#333;
   filter:alpha(opacity=85);
