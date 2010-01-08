@@ -1,10 +1,14 @@
-window.onload = function() {
-  //===========================
-  //UNIT TEST DEFINITION
-  //===========================
-  var unit_tests = [ 
+(function() {
+  //shortcuts for typing purposes
+  var assert = TinyTest.assert;
+  var done = TinyTest.done;
+  var warn = TinyTest.warn;
+  
+  //register unit tests
+  TinyTest.registerTests([ 
     {
       name: "Core API - Extend Function",
+      suite: "core",
       unit_test: function() {
         var defaultsSet = false;
         var defaultOverridden = false;
@@ -37,19 +41,8 @@ window.onload = function() {
       }
     },
     {
-      name: "XMLHttpRequest test - <a href='http://code.google.com/p/xmlhttprequest'>Source</a>",
-      unit_test: function() {
-        warn("Need to implement some tests");
-        done();
-        
-        /*setTimeout(function() {
-          assert(htmlFetched,"GET request retrieved HTML.");
-          done();
-        },500);*/
-      }
-    },
-    {
       name: "JSON API Tests",
+      suite: "core",
       unit_test: function() {
         var toStringGood = false;
         var parseGood = false;
@@ -70,6 +63,7 @@ window.onload = function() {
     },
     {
       name: "MQ API - Direct Publish and Subscribe",
+      suite: "mq",
       unit_test: function() {
         var matchWorked = false;
         var noMatchWorked = true;
@@ -93,6 +87,7 @@ window.onload = function() {
     },
     {
       name: "MQ API - RegExp Subscribe",
+      suite: "mq",
       unit_test: function() {
         var matchWorked = false;
         var noMatchWorked = true;
@@ -116,6 +111,7 @@ window.onload = function() {
     },
     {
       name: "MQ API - Using payloads",
+      suite: "mq",
       unit_test: function() {
         var deilvered = false;
         
@@ -133,6 +129,7 @@ window.onload = function() {
     },
     {
       name: "MQ API - Using scopes",
+      suite: "mq",
       unit_test: function() {
         var scopeWorked = false;
         var noScopeWorked = true;
@@ -156,6 +153,7 @@ window.onload = function() {
     },
     {
       name: "MQ API - Testing unsubscribe",
+      suite: "mq",
       unit_test: function() {
         var unsubbed = true;
         
@@ -175,6 +173,7 @@ window.onload = function() {
     },
     {
       name: "MQ API - Testing listener priority",
+      suite: "mq",
       unit_test: function() {
         var priorityWorked = false;
         
@@ -202,6 +201,7 @@ window.onload = function() {
     },
     {
       name: "MQ API - Configure queue scan interval",
+      suite: "mq",
       unit_test: function() {
         var delivered = false;
         
@@ -224,141 +224,6 @@ window.onload = function() {
           done();
         },4000);
       }
-    },
-    {
-      name: "Remote Messages - Test Hello World",
-      unit_test: function() {
-        var receivedWithPayload = false;
-        var scopeWorked = true;
-        
-        //Should receive response
-        mq.sub("r:say.hello.response",function(msg) {
-          if (msg.payload == "Hello World!") {
-            receivedWithPayload = true;
-          }
-        });
-        
-        //Should NOT receive response due to scope
-        mq.sub("r:say.hello.response",function(msg) {
-          scopeWorked = false;
-        },{
-          scope:"myscope"
-        });
-        
-        //Send remote message
-        mq.pub("r:say.hello.request");
-        
-        //Test after we've had some time to get a response
-        setTimeout(function() {
-          assert(receivedWithPayload, "Remote response received with proper payload.");
-          assert(scopeWorked, "Remote response has proper default scope assigned");
-          done();
-        },3000);
-      }
     }
-  ];
-  //===========================
-  //END UNIT TESTS
-  //===========================
-  
-  
-  //---------------------------
-  //Test harness implementation
-  //---------------------------  
-  var tests_executed = 0; 
-  var assertions = 0;
-  var successes = 0;
-  var failures = 0;
-  var warnings = 0;
-  var executing = false;
-  
-  //print status message
-  function status(message) {
-    var inner = document.getElementById("resultlist").innerHTML;
-    inner = inner+"<li class='status'>"+message+"</li>";
-    document.getElementById("resultlist").innerHTML = inner;
-  }
-  
-  //print failure
-  function fail(message) {
-    assertions=assertions+1;
-    failures=failures+1;
-    var inner = document.getElementById("resultlist").innerHTML;
-    inner = inner+"<li class='failure'>"+message+"</li>";
-    document.getElementById("resultlist").innerHTML = inner;
-  }
-  
-  //print warning
-  function warn(message) {
-    warnings=warnings+1;
-    var inner = document.getElementById("resultlist").innerHTML;
-    inner = inner+"<li class='warn'>"+message+"</li>";
-    document.getElementById("resultlist").innerHTML = inner;
-  }
-  
-  //print success
-  function success(message) {
-    assertions++;
-    successes++;
-    var inner = document.getElementById("resultlist").innerHTML;
-    inner = inner+"<li class='success'>"+message+"</li>";
-    document.getElementById("resultlist").innerHTML = inner;
-  }
-  
-  //assert a test condition, and display feedback
-  function assert(value,description) {    
-    if (value) {
-      success(description);
-    }
-    else {
-      fail("Assertion Failed: "+description);
-    }
-  }
-  
-  //end current test
-  function done() {
-    executing = false;
-  }
-  
-  //print summary
-  function end() {
-    var inner = "<h3 class='summary'>Test Suite Summary:</h3>"+
-      "<div class='summary'>"+
-      tests_executed+ " tests ("+
-      assertions+" assertions) completed with <span class='success'>"+
-      successes+" successes</span>, <span class='warn'>"+ 
-      warnings+" warnings</span>, and <span class='failure'>"+
-      failures+" failures</span>. <br/><br/>  Have a nice day!</div>";
-    document.getElementById("status").innerHTML = inner;
-  }  
-  
-  //Get unit test suite from URL parameter (optional - will run all by default)
-  var regexS = "[\\?&]suite=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  var suite = null;
-  if( results != null ) {
-    suite = results[1];
-  }
-  
-  //Start running through tests
-  var timer = setInterval(function() {
-    if (unit_tests.length == 0 && !executing) {
-      clearInterval(timer);
-      end();
-    }
-    if (!executing && unit_tests.length > 0) {
-      executing = true;
-      var tst = unit_tests.shift();
-      if (suite == null || tst.suite == suite) {
-        status("Executing test: '"+ tst.name +"'...");
-        tst.unit_test.call({});
-        tests_executed++;
-      }
-      else {
-        executing = false;
-      }
-    }
-  },10);
-  
-};
+  ]);
+})();

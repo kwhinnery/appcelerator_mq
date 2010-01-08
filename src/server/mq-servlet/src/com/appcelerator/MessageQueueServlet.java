@@ -98,7 +98,7 @@ public class MessageQueueServlet extends HttpServlet {
 					response.setPayload(MessageQueueServlet.defaultMessage("We couldn't instantiate and call your service class - check spelling of listener package in web.xml."));
 					e.printStackTrace();
 				}
-				//Process result - if it's null, it was likely a void return type and we don't care
+				//Process result - if it's null, continue processing other messages
 				if (result == null) { }
 				//if it's Boolean.TRUE, then squash the message from further processing
 				else if (result instanceof Boolean && Boolean.TRUE.equals(result)) {
@@ -107,10 +107,12 @@ public class MessageQueueServlet extends HttpServlet {
 				//If it's a message, go ahead and return it, assume the service knows what it's doing.
 				else if (result instanceof Message) {
 					response = (Message) result;
+					break;
 				}
 				//otherwise, treat the response as the message payload for the response
 				else {
 					response.setPayload(result);
+					break;
 				}
 			}
 		}

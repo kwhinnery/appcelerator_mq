@@ -1,34 +1,19 @@
 (function() {  
   //Implement MQ API
 	var MESSAGE_QUEUE = []; //this array represents the current message queue
-	var FILTERS = []; //this array holds filters - first in gets priority, and can cancel others 
 	var LISTENERS = []; //this array represents the message listeners
 	
 	//Scan the message queue and deliver messages to listeners
 	function deliver() {
-	  var hadMessages = false;
 		while (MESSAGE_QUEUE.length > 0) {
-		  hadMessages = true;
 			var message = MESSAGE_QUEUE.shift();
-			//Allow filters to process (or squash) messages
-			var send_message = true;
-			for(filter_index in FILTERS) {
-				var filter = FILTERS[filter_index];
-				if (listensFor(message,filter)) {
-				  var result = filter.callback.call(this, message);
-				  if (result != null && !result) {
-            send_message = false;
-            break;
-          }
-				}
-			}
-			//If the message was not squashed by an interceptor, let the listeners process it
-			if (send_message) {
-				for(listener_index in LISTENERS) {
-					var listener = LISTENERS[listener_index];
-					if (listensFor(message,listener)) {
-					  listener.callback.call(this, message);
-					}
+			for(listener_index in LISTENERS) {
+				var listener = LISTENERS[listener_index];
+				if (listensFor(message,listener)) {
+				  //execute listener, break if a true is returned
+				  if (listener.callback.call(this, message) == true) {
+				    break;
+				  }
 				}
 			}
 		}
@@ -77,9 +62,14 @@
         pattern: _pattern,
         callback: _callback,
         scope: "default",
+        priority: -1,
         handle: "listener"+Math.random().toString()
       },_args||{});
       LISTENERS.push(listener);
+      //sort according to priority, highest coming first
+      LISTENERS.sort(function(a,b) {
+        return b.priority - a.priority;
+      });
       return listener;
     },
     unsub: function(_listener) {
@@ -87,24 +77,6 @@
   			var current = LISTENERS[listener_index];
   			if (_listener.handle === current.handle) {
   				LISTENERS.splice(listener_index,1);
-  			}
-  		}
-    },
-    filter: function(_pattern,_callback,_args) {
-      var filter = mq.extend({
-        pattern: _pattern,
-        callback: _callback,
-        scope: "default",
-        handle: "filter"+Math.random().toString()
-      },_args||{});
-      FILTERS.push(filter);
-      return filter;
-    },
-    unfilter: function(_filter) {
-  		for(filter_index in FILTERS) {
-  			var current = FILTERS[filter_index];
-  			if (_filter.handle === current.handle) {
-  				FILTERS.splice(filter_index,1);
   			}
   		}
     }
