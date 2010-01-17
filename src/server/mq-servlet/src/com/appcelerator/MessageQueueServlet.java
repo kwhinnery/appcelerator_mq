@@ -1,7 +1,6 @@
 package com.appcelerator;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -136,13 +135,7 @@ public class MessageQueueServlet extends HttpServlet {
 			Iterator<Class> it = listenerClasses.iterator();
 			while (it.hasNext()) {
 				Class current = it.next();
-				//We can only work with classes with a visible default constructor, skip any that don't have one
-				if (current.getConstructors().length == 0) {
-					break;
-				}
-				Constructor cons = current.getConstructors()[0];
-				Object[] consArgs = new Object[0];
-				Object instance = cons.newInstance(consArgs);
+				Object instance = current.newInstance();
 				Method[] currentMethods = current.getDeclaredMethods();
 				for (int i = 0;i < currentMethods.length;i++) {
 					Method meth = currentMethods[i];
