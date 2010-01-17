@@ -7,6 +7,7 @@ listeners are provided for:
 
 * Java Servlets (Standard container or Google App Engine for Java)
 * Planned support for Sinatra (a super lightweight Ruby web framework)
+* Planned support for plain 'ol PHP
   
 Official docs and more info are coming soon to [Codestrong](http://www.codestrong.com).
 
