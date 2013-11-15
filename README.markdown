@@ -1,4 +1,5 @@
-#Appcelerator Message Queue (MQ)#
+#Appcelerator Message Queue (MQ)
+
 Appcelerator MQ is a simple client-server message bus for HTML/JavaScript applications
 (and soon Adobe Flex applications) which enables event-driven RIAs.  MQ can be used on 
 the client side only, or can be used in conjunction with a server-side listener to provide
